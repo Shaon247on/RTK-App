@@ -1,8 +1,7 @@
 "use client";
 
-import { IconCirclePlusFilled, IconMail, type Icon } from "@tabler/icons-react";
+import { type Icon } from "@tabler/icons-react";
 
-import { Button } from "@/components/ui/button";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -11,6 +10,9 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
+import { useAppSelector } from "@/store/hooks/typehooks";
+import { setRouteHeader } from "@/store/slices/stateSlice";
+import { useDispatch } from "react-redux";
 
 export function NavMain({
   items,
@@ -21,33 +23,27 @@ export function NavMain({
     icon?: Icon;
   }[];
 }) {
+  const dispatch = useDispatch();
+  const headerTitle = useAppSelector(state=> state.stateSlice.routeHeader)
+
+  const handleNav = (item: { title: string; url: string; icon?: Icon }) => {
+    dispatch(setRouteHeader(item.title));
+  };
   return (
     <SidebarGroup>
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
-          <SidebarMenuItem className="flex items-center gap-2">
-            <SidebarMenuButton
-              tooltip="Quick Create"
-              className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
-            >
-              <IconCirclePlusFilled />
-              <span>Quick Create</span>
-            </SidebarMenuButton>
-            <Button
-              size="icon"
-              className="size-8 group-data-[collapsible=icon]:opacity-0"
-              variant="outline"
-            >
-              <IconMail />
-              <span className="sr-only">Inbox</span>
-            </Button>
-          </SidebarMenuItem>
+          <SidebarMenuItem className="flex items-center gap-2"></SidebarMenuItem>
         </SidebarMenu>
         <SidebarMenu>
           {items.map((item) => (
-            <Link key={item.title} href={item.url}>
+            <Link
+              onClick={() => handleNav(item)}
+              key={item.title}
+              href={item.url}
+            >
               <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton tooltip={item.title}>
+                <SidebarMenuButton tooltip={item.title} className={`${headerTitle === item.title && "bg-black text-white hover:bg-black/70 hover:text-white"}`}>
                   {item.icon && <item.icon />}
                   <span>{item.title}</span>
                 </SidebarMenuButton>
